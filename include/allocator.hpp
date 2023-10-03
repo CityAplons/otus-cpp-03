@@ -2,19 +2,25 @@
 
 #include <memory>
 #include <stack>
+#include <type_traits>
 #include <vector>
 
 namespace otus {
 
 template <class T, size_t pool_size>
 struct Allocator {
-  using value_type = T;
+  typedef T value_type;
+  typedef size_t size_type;
+  typedef ptrdiff_t difference_type;
+  typedef T* pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
   std::shared_ptr<T> pool_ = nullptr;
   std::stack<T*, std::vector<T*>> slots_;
 
   Allocator() noexcept : pool_(new T[pool_size * sizeof(T)]) {
-    T* begin = pool_.get();
-    const T* end = begin + pool_size;
+    pointer begin = pool_.get();
+    const pointer end = begin + pool_size;
 
     while (begin != end) slots_.push(begin++);
   };
@@ -29,7 +35,7 @@ struct Allocator {
     return Allocator(pool_size);
   }
 
-  T* allocate(std::size_t n) {
+  pointer allocate(std::size_t n) {
     if (n > max_size()) throw std::invalid_argument("Not enough memory");
 
     if (slots_.empty()) throw std::bad_alloc();
@@ -39,8 +45,9 @@ struct Allocator {
     return p;
   }
 
-  void deallocate(T* p, std::size_t n) {
+  void deallocate(pointer p, std::size_t n) {
     if (n > max_size()) throw std::invalid_argument("Not enough memory");
+    if (p == nullptr) throw std::invalid_argument("Bad pointer");
 
     if (slots_.size() == pool_size)
       throw std::runtime_error("Pool is fully free");
@@ -63,13 +70,13 @@ struct Allocator {
 template <class T, class U, size_t sz>
 constexpr bool operator==(const Allocator<T, sz>& a1,
                           const Allocator<U, sz>& a2) noexcept {
-  return a1.pool == a2.pool;
+  return a1.pool_ == a2.pool_ && a1.slots_.size() == a2.slots_.size();
 }
 
 template <class T, class U, size_t sz>
 constexpr bool operator!=(const Allocator<T, sz>& a1,
                           const Allocator<U, sz>& a2) noexcept {
-  return a1.pool != a2.pool;
+  return a1.pool_ != a2.pool_ && a1.slots_.size() == a2.slots_.size();
 }
 
 }  // namespace otus

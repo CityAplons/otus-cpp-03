@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_REVISION 1 CACHE INTERNAL "Project revision (CI)")
 project(otus_cpp_03_allocator
-    VERSION 0.0.${PROJECT_REVISION}
+    VERSION 1.0.${PROJECT_REVISION}
     DESCRIPTION "General CMake template for C++ projects by N.Mikhailovskiy"
     HOMEPAGE_URL "https://github.com/CityAplons/cmake-multiplatform-template"
     LANGUAGES CXX

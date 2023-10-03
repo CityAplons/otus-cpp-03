@@ -2,8 +2,9 @@
 #include <map>
 #include <string>
 
-#include "../include/allocator.hpp"
-// #include "project.h"
+#include "allocator.hpp"
+#include "container.hpp"
+#include "project.h"
 
 constexpr int elementsCount = 10;
 constexpr inline int factorial(int n) {
@@ -12,11 +13,10 @@ constexpr inline int factorial(int n) {
 }
 
 int main(int argc, char const *argv[]) {
-  // struct ProjectInfo info = {};
+  struct ProjectInfo info = {};
+  std::cout << info.nameString << "\t" << info.versionString << '\n';
 
-  // std::cout << info.nameString << "\t" << info.versionString << '\n';
-
-  // 1
+  // 1.1
 
   std::map<int, int> defaultAllocatedMap;
   for (int i = 0; i < elementsCount; ++i) {
@@ -24,9 +24,12 @@ int main(int argc, char const *argv[]) {
   }
   std::cout << "default map"
             << ": \n\t";
-  for (auto &[key, value] : defaultAllocatedMap)
+  for (auto &[key, value] : defaultAllocatedMap) {
     std::cout << key << " " << value << "\n\t";
+  }
   std::cout << '\n';
+
+  // 1.2
 
   using valueType = std::map<int, int>::value_type;
   using allocator = otus::Allocator<valueType, elementsCount>;
@@ -39,8 +42,35 @@ int main(int argc, char const *argv[]) {
   for (auto &&[id, val] : poolMap) {
     std::cout << id << " " << val << "\n\t";
   }
-
   std::cout << '\n';
+
+  // 2.1
+
+  otus::Vector<int> defaultAllocatedVector;
+  for (int i = 0; i < elementsCount; ++i) {
+    defaultAllocatedVector.push_back(i);
+  }
+
+  std::cout << "pool custom vector"
+            << ": \n\t";
+  for (auto &&value : defaultAllocatedVector) {
+    std::cout << value << "\n\t";
+  }
+  std::cout << std::endl;
+
+  // 2.2
+
+  otus::Vector<int, otus::Allocator<int, elementsCount * 2>> poolVector;
+  for (int i = 0; i < elementsCount; ++i) {
+    poolVector.push_back(i);
+  }
+
+  std::cout << "pool custom vector"
+            << ": \n\t";
+  for (auto &&value : poolVector) {
+    std::cout << value << "\n\t";
+  }
+  std::cout << std::endl;
 
   (void)argc;
   (void)argv;
