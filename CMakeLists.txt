@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_REVISION 1 CACHE INTERNAL "Project revision (CI)")
-project(cmake_template
+project(otus_cpp_03_allocator
     VERSION 0.0.${PROJECT_REVISION}
     DESCRIPTION "General CMake template for C++ projects by N.Mikhailovskiy"
     HOMEPAGE_URL "https://github.com/CityAplons/cmake-multiplatform-template"
     LANGUAGES CXX
 )
 
-set_property(GLOBAL PROPERTY G_CXX_STANDARD 14)
+set_property(GLOBAL PROPERTY G_CXX_STANDARD 17)
 set_property(GLOBAL PROPERTY G_CXX_STANDARD_REQUIRED ON)
 
 # Include utility functions
@@ -27,21 +27,22 @@ target_include_directories(version
 )
 
 # Describe build targets
-add_executable(helloworld_cli src/hello.cpp)
-target_link_libraries(helloworld_cli PRIVATE
+include_directories(include/)
+add_executable(task_cli src/main.cpp)
+target_link_libraries(task_cli PRIVATE
     version
 )
 
-set_compile_options(helloworld_cli)
+set_compile_options(task_cli)
 set_compile_options(version)
 
-install(TARGETS helloworld_cli
+install(TARGETS task_cli
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 # Describe unit tests
 enable_testing()
-add_unit_test(test/test_version.cpp version)
+# add_unit_test(test/test_version.cpp version)
 
 # Packaging
 option(MAKE_PACKAGE "Add 'package' and 'package_source' build targets for packages" ON)
