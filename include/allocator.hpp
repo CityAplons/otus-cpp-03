@@ -15,15 +15,19 @@ struct Allocator {
   typedef T* pointer;
   typedef T& reference;
   typedef const T& const_reference;
-  std::shared_ptr<T> pool_ = nullptr;
+  pointer pool_ = nullptr;
   std::stack<T*, std::vector<T*>> slots_;
 
   Allocator() noexcept : pool_(new T[pool_size * sizeof(T)]) {
-    pointer begin = pool_.get();
+    pointer begin = pool_;
     const pointer end = begin + pool_size;
 
     while (begin != end) slots_.push(begin++);
   };
+
+  ~Allocator() {
+    delete[] pool_;
+  }
 
   template <class U, size_t sz>
   Allocator(const Allocator<U, sz>& a) noexcept {

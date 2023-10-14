@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+#include <cstring>
 #include <iterator>
 
 namespace otus {
@@ -62,9 +64,51 @@ class Vector {
 
       capacity_ = newCapacity;
       std::swap(newData, data_);
+      std::allocator_traits<Allocator>::deallocate(allocator_, newData,
+                                                   newCapacity);
     }
 
     data_[size_++] = val;
+  }
+
+  Vector() {
+    data_ = std::allocator_traits<Allocator>::allocate(allocator_, 1);
+    capacity_ = 1;
+  }
+
+  Vector(const Vector& a) : size_(a.size_), capacity_(a.capacity_) {
+    data_ = std::allocator_traits<Allocator>::allocate(allocator_, capacity_);
+    std::memcpy(data_, a.data_, a.size_ * sizeof(T));
+  }
+
+  Vector(Vector&& a) noexcept : size_(a.size_), capacity_(a.capacity_) {
+    assert(allocator_ == a.allocator_);
+    data_ = a.data_;
+    a.data_ = nullptr;
+  }
+
+  Vector& operator=(const Vector& a) {
+    if (this == &a) return *this;
+
+    pointer tmp =
+        std::allocator_traits<Allocator>::allocate(allocator_, capacity_);
+    std::memcpy(tmp, a.data_, a.size_ * sizeof(T));
+    std::allocator_traits<Allocator>::deallocate(allocator_, data_, capacity_);
+    data_ = tmp;
+    return *this;
+  }
+
+  Vector& operator=(Vector&& a) noexcept {
+    if (this == &a) return *this;
+
+    std::allocator_traits<Allocator>::deallocate(allocator_, data_, capacity_);
+    data_ = a.data_;
+    a.data_ = nullptr;
+    return *this;
+  }
+
+  ~Vector() {
+    std::allocator_traits<Allocator>::deallocate(allocator_, data_, capacity_);
   }
 
  private:

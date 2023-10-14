@@ -72,6 +72,15 @@ int main(int argc, char const *argv[]) {
   }
   std::cout << std::endl;
 
+  otus::Vector<int> a;
+  a.push_back(42);
+  auto b = a;
+
+  for (auto &&value : b) {
+    std::cout << value << "\n\t";
+  }
+  std::cout << std::endl;
+
   (void)argc;
   (void)argv;
   return 0;
